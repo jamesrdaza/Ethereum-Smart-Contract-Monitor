@@ -17,7 +17,7 @@ export function initDB(setFuncs) {
         walletStore.createIndex("privateKey", "privateKey");
         //walletStore.createIndex("address", "address");
 
-        const contractStore = db.createObjectStore("contracts", { autoIncrement: true });
+        const contractStore = db.createObjectStore("contracts", { keyPath: "address" });
         /* contractStore.createIndex("contractName", "name", { unique: false }); */
         contractStore.createIndex("address", "address");
         contractStore.createIndex("ABI", "ABI");
@@ -25,7 +25,7 @@ export function initDB(setFuncs) {
         contractStore.createIndex("mintFunction", "mintFunction");
         contractStore.createIndex("arguments", "args");
 
-        const taskStore = db.createObjectStore("tasks", { autoIncrement: true });
+        const taskStore = db.createObjectStore("tasks");
         taskStore.createIndex("privateKey", "privateKey", { unique: false });
         taskStore.createIndex("contractAddress", "address", { unique: false });
         taskStore.createIndex("ABI", "ABI", { unique: false });
@@ -76,7 +76,8 @@ export function initDB(setFuncs) {
         taskWalk.onsuccess = (event) => {
             let taskCursor = event.target.result;
             if (taskCursor != null) {
-                setFuncs.addTask({ pk: taskCursor.value.privateKey, address: "0x" },
+
+                setFuncs.addTask(taskCursor.key, { pk: taskCursor.value.privateKey, address: "0x" },
                     { address: taskCursor.value.contractAddress, abi: taskCursor.value.ABI, mintFunction: taskCursor.value.mintFunction, flipFunction: taskCursor.value.flipFunction, params: taskCursor.value.arguments },
                     taskCursor.value.maxGasFee, taskCursor.value.maxPriorityFee, taskCursor.value.value, taskCursor.value.arguments);
             }
@@ -180,7 +181,36 @@ export function storeContract(addr, abi, mint, flip, args) {
     };
 }
 
-export function storeTask(pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args) {
+export function destroyContract(addr) {
+    let request = window.indexedDB.open(dbName);
+
+    request.onsuccess = function () {
+        let db = request.result;
+        let transaction = db.transaction(["contracts"], "readwrite");
+        let objStore = transaction.objectStore("contracts");
+        console.log(addr);
+        let deleteRequest = objStore.delete(addr);
+
+        deleteRequest.onsuccess = function () {
+            console.log(deleteRequest.result);
+        };
+
+        deleteRequest.onerror = function () {
+            console.error("Error Could not delete contract");
+        };
+
+        transaction.oncomplete = function () {
+            db.close();
+        };
+
+        request.onerror = function () {
+            console.error("Error: Could not Access Database");
+            return false;
+        };
+    }
+}
+
+export function storeTask(uuid, pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args) {
     let request = window.indexedDB.open("botDB");
 
     request.onsuccess = function () {
@@ -188,7 +218,7 @@ export function storeTask(pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args
         let transaction = db.transaction(["tasks"], "readwrite");
         let store = transaction.objectStore("tasks");
 
-        let storeRequest = store.add({ privateKey: pk, contractAddress: cAddr, ABI: abi, mintFunction: mint, flipFunction: flip, value: val, maxGasFee: maxGas, maxPriorityFee: maxPrio, arguments: args });
+        let storeRequest = store.add({ privateKey: pk, contractAddress: cAddr, ABI: abi, mintFunction: mint, flipFunction: flip, value: val, maxGasFee: maxGas, maxPriorityFee: maxPrio, arguments: args }, uuid);
 
         storeRequest.onsuccess = function () {
             console.log("Succesfully Added Task");
@@ -206,4 +236,33 @@ export function storeTask(pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args
     request.onerror = function () {
         console.error("Error: Could not Access Database");
     };
+}
+
+export function destroyTask(addr) {
+    let request = window.indexedDB.open(dbName);
+
+    request.onsuccess = function () {
+        let db = request.result;
+        let transaction = db.transaction(["tasks"], "readwrite");
+        let objStore = transaction.objectStore("tasks");
+        console.log(addr);
+        let deleteRequest = objStore.delete(addr);
+
+        deleteRequest.onsuccess = function () {
+            console.log(deleteRequest.result);
+        };
+
+        deleteRequest.onerror = function () {
+            console.error("Error Could not delete task");
+        };
+
+        transaction.oncomplete = function () {
+            db.close();
+        };
+
+        request.onerror = function () {
+            console.error("Error: Could not Access Database");
+            return false;
+        };
+    }
 }

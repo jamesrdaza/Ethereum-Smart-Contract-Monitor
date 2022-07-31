@@ -4,6 +4,7 @@ import WalletContext from '../Contexts/WalletContext.js';
 import ContractContext from '../Contexts/ContractContext.js';
 import { useContext, useRef } from 'react';
 import { storeTask } from '../indexedDB/BotDB.js';
+import { v4 as uuidv4 } from "uuid";
 
 const Tasks = () => {
     const { wallets, searchWallets } = useContext(WalletContext);
@@ -40,8 +41,9 @@ const Tasks = () => {
         // Hardcoded expecting Ints Fix Later
         args = args.map(parseInt);
         console.log(contract);
-        addTask(wallet, contract, maxGasFee, maxPriorityFee, value, args);
-        storeTask(wallet.pk, contract.address, contract.abi, contract.mintFunction, contract.flipFunction, value, maxGasFee, maxPriorityFee, args);
+        let uuid = uuidv4();
+        addTask(uuid, wallet, contract, maxGasFee, maxPriorityFee, value, args);
+        storeTask(uuid, wallet.pk, contract.address, contract.abi, contract.mintFunction, contract.flipFunction, value, maxGasFee, maxPriorityFee, args);
         setHidden(true);
     }
     return (
@@ -50,7 +52,7 @@ const Tasks = () => {
                 <option >Select Wallet</option>
                 {
                     wallets.map((wallet) => (
-                        <option key={wallet.id}>{wallet.address}</option>
+                        <option key={wallet.address}>{wallet.address}</option>
                     ))
                 }
             </select>
@@ -58,7 +60,7 @@ const Tasks = () => {
                 <option >Select Contract</option>
                 {
                     contracts.map((contract) => (
-                        <option>{contract.address}</option>
+                        <option key={contract.address}>{contract.address}</option>
                     ))
                 }
             </select>
@@ -78,7 +80,7 @@ const Tasks = () => {
             <h3>Tasks</h3>
             {
                 tasks.map((task) => (
-                    <Task key={task.id} task={task} />
+                    <Task key={task.uuid} task={task} />
                 ))
             }
         </div>

@@ -32,7 +32,7 @@ const Wallets = () => {
             <h3>Wallets</h3>
             {
                 wallets.map((wallet) => (
-                    <Wallet key={wallet.id} wallet={wallet} />
+                    <Wallet key={wallet.address} wallet={wallet} />
                 ))
             }
         </div>

@@ -2,10 +2,10 @@ import TaskInstance from '../TaskClass.js'
 import TaskContext from '../Contexts/TasksContext.js';
 import { useContext, useEffect } from 'react';
 import ContractContext from '../Contexts/ContractContext.js';
-import { storeTask } from '../indexedDB/BotDB.js';
+import { storeTask, destroyTask } from '../indexedDB/BotDB.js';
 
 const Task = ({ task }) => {
-    const { instances, addInstance } = useContext(TaskContext);
+    const { instances, addInstance, deleteInstance, deleteTask } = useContext(TaskContext);
     const { contractABI } = useContext(ContractContext);
 
     useEffect(() => {
@@ -16,17 +16,23 @@ const Task = ({ task }) => {
 
         // TODO: Change constructor to object so my eyes don't hurt looking at this declaration
         const newInstance = new TaskInstance(task.wallet.pk, task.contract.address, task.contract.abi, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params);
-        addInstance(newInstance);
+        addInstance(task.uuid, newInstance);
 
         //Check dependency array
     }, [TaskInstance]);
 
     // Execute task
     const execute = () => {
-        const taskInstance = instances[task.id];
-        console.log(taskInstance.instance)
-        /*   taskInstance.instance.init(); */
-        taskInstance.instance.monitor();
+        const taskInstance = instances[task.uuid];
+        console.log(taskInstance)
+
+        taskInstance.monitor();
+    }
+
+    const removeTask = () => {
+        task.destroyTask(task.uuid);
+        deleteInstance(task.uuid);
+        deleteTask(task.uuid)
     }
 
     return (
@@ -38,7 +44,7 @@ const Task = ({ task }) => {
             </div>
             <button style={{ margin: "5px", width: "10%" }} onClick={execute}>Start</button>
             <button style={{ margin: "5px", width: "10%" }} onClick={execute}>Stop</button>
-            <button style={{ margin: "5px", width: "10%" }} onClick={execute}>Delete</button>
+            <button style={{ margin: "5px", width: "10%" }} onClick={removeTask}>Delete</button>
         </div>
     )
 }

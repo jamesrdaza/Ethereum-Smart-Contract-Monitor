@@ -6,27 +6,14 @@ export default class TaskInstance {
         this.provider = new ethers.providers.JsonRpcProvider(httpRPC);
         this.ws;
         this.wsUrl = wsRPC;
+        this.go = true;
+
         // Init contract then connect wallet to get new Contract object
         this.setUpContract = new ethers.Contract(contractAddress, ABI, this.provider);
         this.signContract = this.setUpContract.connect(this.wallet);
 
-        /*         this.ws.onopen = (event) => {
-                    console.log("CONNECTING...")
-        
-                    // Send request for pending txn to contract from alchemy
-                    this.ws.send(JSON.stringify({
-                        "jsonrpc": "2.0", "id": 2,
-                        "method": "eth_subscribe",
-                        "params": ["alchemy_pendingTransactions",
-                            {
-                                "toAddress": this.signContract.address,
-                                "hashesOnly": false
-                            }]
-                    }));
-                } */
-
         this.wallet = new ethers.Wallet(privateKey, this.provider);
-        console.log(ABI)
+
         // Init contract then connect wallet to get new Contract object
         this.setUpContract = new ethers.Contract(contractAddress, ABI, this.provider);
         this.signContract = this.setUpContract.connect(this.wallet);
@@ -51,25 +38,8 @@ export default class TaskInstance {
 
     }
 
-    init() {
-        console.log("init called")
-        this.ws.onopen = (event) => {
-            console.log("CONNECTING...")
-
-            // Send request for pending txn to contract from alchemy
-            this.ws.send(JSON.stringify({
-                "jsonrpc": "2.0", "id": 2,
-                "method": "eth_subscribe",
-                "params": ["alchemy_pendingTransactions",
-                    {
-                        "toAddress": this.signContract.address,
-                        "hashesOnly": false
-                    }]
-            }));
-        }
-    }
-
     async monitor() {
+        this.go = true;
         this.ws = new WebSocket(this.wsUrl);
         this.ws.onopen = (event) => {
             console.log("CONNECTING...")
@@ -89,6 +59,7 @@ export default class TaskInstance {
             let msgData = JSON.parse(msg.data);
 
             if ("params" in msgData) {
+                console.log("Sending Transaction...")
                 let msgInput = msgData.params.result.input;
                 let funcSignature = msgInput.substring(0, 10);
 
@@ -101,7 +72,7 @@ export default class TaskInstance {
                         maxPriorityFeePerGas: this.maxPriorityFeePerGas
                     })
                         // Debugs for now
-                        .then(txnReceipt => console.log(txnReceipt))
+                        .then(txnReceipt => { console.log("Completed Printing Receipt..."); console.log(txnReceipt) })
                         .catch(async () => {
                             await this.wait(500);
                             await this.retry();
@@ -116,18 +87,26 @@ export default class TaskInstance {
 
     // Retry if failed
     async retry() {
-        this.signContract[this.mintFunction](...this.args, {
-            maxFeePerGas: this.maxFeePerGas,
-            maxPriorityFeePerGas: this.maxPriorityFeePerGas
-        })
-            .then(txnReceipt => console.log(txnReceipt))
-            .catch(async () => {
-                await this.wait(500);
-                await this.retry();
-            });
+        if (this.go) {
+            console.log("Retrying...")
+            this.signContract[this.mintFunction](...this.args, {
+                maxFeePerGas: this.maxFeePerGas,
+                maxPriorityFeePerGas: this.maxPriorityFeePerGas
+            })
+                .then(txnReceipt => { console.log("Completed Printing Receipt..."); console.log(txnReceipt) })
+                .catch(async () => {
+                    await this.wait(500);
+                    await this.retry();
+                });
+        }
     }
 
     wait(ms) {
         return (new Promise(resolve => setTimeout(resolve, ms)))
     }
+
+    stop() {
+        this.go = false;
+    }
+
 };

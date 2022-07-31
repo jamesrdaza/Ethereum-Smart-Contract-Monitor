@@ -80,7 +80,7 @@ const Contracts = () => {
                     <option disabled value="DEFAULT">Select Mint Function</option>
                     {
                         fetchFuncs.map((func) => (
-                            <option>{func.name}</option>
+                            <option key={func.name}>{func.name}</option>
                         ))
                     }
                 </select>
@@ -88,7 +88,7 @@ const Contracts = () => {
                     <option disabled value="DEFAULT">Select Flip Function</option>
                     {
                         fetchFuncs.map((func) => (
-                            <option>{func.name}</option>
+                            <option key={func.name}>{func.name}</option>
                         ))
                     }
                 </select>
@@ -97,7 +97,7 @@ const Contracts = () => {
             <h3>Contracts</h3>
             {
                 contracts.map((contract) => (
-                    <Contract key={contract.id} contract={contract} />
+                    <Contract key={contract.address} contract={contract} />
                 ))
             }
             <br></br>

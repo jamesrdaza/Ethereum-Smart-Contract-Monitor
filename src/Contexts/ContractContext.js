@@ -15,9 +15,15 @@ export function ContractProvider({ children }) {
     const [id, setId] = useState(0); // Temp Incremental ID's will change later
 
     const addContract = (address, abi, mintFunction, flipFunction, params) => {
-        setContract((prev) => [...prev, { id, address, abi, mintFunction, flipFunction, params }])
+        setContract((prev) => [...prev, { address, abi, mintFunction, flipFunction, params }])
         setId(id + 1);
     };
+
+    const removeContract = (address) => {
+        setContract(contracts.filter((contract) => {
+            return contract.address !== address
+        }))
+    }
 
     const searchContracts = (address) => {
         for (let i = 0; i < contracts.length; i++) {
@@ -39,13 +45,7 @@ export function ContractProvider({ children }) {
         setParams([])
     }
 
-    const removeContract = (id) => {
-        for (let i = 0; i < contracts.length; i++) {
-            if (id === contracts.id) {
-                setContract(contracts.splice(i, i + 1));
-            }
-        }
-    }
+
 
     return (
         <ContractContext.Provider value={{

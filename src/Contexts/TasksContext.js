@@ -4,23 +4,37 @@ const TaskContext = createContext();
 
 export function TaskProvider({ children }) {
     const [tasks, setTask] = useState([]); // Task elements
-    const [instances, setInstances] = useState([]); // Instances of taskClass object
+    const [instances, setInstances] = useState({}); // Instances of taskClass object
     const [paramState, setParamState] = useState([]); // Parameters to get filled by contract parameters
     const [isHidden, setHidden] = useState(true);
-    const [id, setId] = useState(0);
 
-    const addTask = (wallet, contract, maxBaseFee, maxPriorityFee, value, params) => {
-        setTask((prev) => [...prev, { id, wallet, contract, maxBaseFee, maxPriorityFee, value, params }])
+
+    const addTask = (uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params) => {
+        setTask((prev) => [...prev, { uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params }])
     };
-    const addInstance = (instance) => {
-        setInstances((prev) =>
-            [...prev, { id, instance }]
+
+    const deleteTask = (uuid) => {
+        setTask(
+            tasks.filter((task) => {
+                task.uuid !== uuid;
+            })
         )
-        setId(id + 1);
+    }
+    const addInstance = (uuid, instance) => {
+        setInstances((prev) => ({
+            ...prev,
+            [uuid]: instance
+        }))
     };
+
+    const deleteInstance = (uuid) => {
+        let tempInst = instances;
+        delete tempInst.uuid;
+        setInstances(tempInst);
+    }
 
     return (
-        <TaskContext.Provider value={{ tasks, addTask, instances, addInstance, paramState, setParamState, isHidden, setHidden }}>
+        <TaskContext.Provider value={{ tasks, addTask, instances, addInstance, paramState, setParamState, isHidden, setHidden, deleteInstance, deleteTask }}>
             {children}
         </TaskContext.Provider>
     );
