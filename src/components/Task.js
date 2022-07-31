@@ -2,6 +2,7 @@ import TaskInstance from '../TaskClass.js'
 import TaskContext from '../Contexts/TasksContext.js';
 import { useContext, useEffect } from 'react';
 import ContractContext from '../Contexts/ContractContext.js';
+import { storeTask } from '../indexedDB/BotDB.js';
 
 const Task = ({ task }) => {
     const { instances, addInstance } = useContext(TaskContext);
@@ -14,17 +15,17 @@ const Task = ({ task }) => {
         let wsRPC = "wss://eth-rinkeby.alchemyapi.io/v2/5DPlF1-TT85CmLvjEuDXaIR8YFyLNg8G";
 
         // TODO: Change constructor to object so my eyes don't hurt looking at this declaration
-        const newInstance = new TaskInstance(task.wallet.pk, task.contract.address, contractABI, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params);
-
+        const newInstance = new TaskInstance(task.wallet.pk, task.contract.address, task.contract.abi, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params);
         addInstance(newInstance);
 
         //Check dependency array
-    }, [addInstance, task.wallet.pk, task.contract.address, contractABI, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params]);
+    }, [TaskInstance]);
 
     // Execute task
     const execute = () => {
         const taskInstance = instances[task.id];
-        taskInstance.instance.init();
+        console.log(taskInstance.instance)
+        /*   taskInstance.instance.init(); */
         taskInstance.instance.monitor();
     }
 

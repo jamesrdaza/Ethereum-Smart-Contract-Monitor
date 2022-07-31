@@ -3,6 +3,7 @@ import TaskContext from '../Contexts/TasksContext.js';
 import WalletContext from '../Contexts/WalletContext.js';
 import ContractContext from '../Contexts/ContractContext.js';
 import { useContext, useRef } from 'react';
+import { storeTask } from '../indexedDB/BotDB.js';
 
 const Tasks = () => {
     const { wallets, searchWallets } = useContext(WalletContext);
@@ -18,7 +19,8 @@ const Tasks = () => {
 
     // Get function parameters from contract context to render
     const getParams = () => {
-        setParamState(params);
+        let contract = searchContracts(contractInput.current.value)
+        setParamState(contract.params);
         setHidden(false);
     }
 
@@ -29,7 +31,7 @@ const Tasks = () => {
         let maxPriorityFee = maxPriorityInput.current.value;
         let value = valueInput.current.value;
         let args = []
-
+        //console.log(contract.args);
         // Get contract parameter fields and push into array for task object
         for (let i = 0; i < paramRef.current.length; i++) {
             args.push(paramRef.current[i].value);
@@ -37,8 +39,9 @@ const Tasks = () => {
 
         // Hardcoded expecting Ints Fix Later
         args = args.map(parseInt);
-
+        console.log(contract);
         addTask(wallet, contract, maxGasFee, maxPriorityFee, value, args);
+        storeTask(wallet.pk, contract.address, contract.abi, contract.mintFunction, contract.flipFunction, value, maxGasFee, maxPriorityFee, args);
         setHidden(true);
     }
     return (

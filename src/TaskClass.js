@@ -1,13 +1,32 @@
 import { ethers } from "ethers";
-import WebSocket from "ws";
+
 export default class TaskInstance {
     constructor(privateKey, contractAddress, ABI, httpRPC, wsRPC, mintFunction, flipFunction, value, maxGasFee, maxPriorityFee, args) {
         // HTTP RPC and WS that retreive and send data through alchemy api
         this.provider = new ethers.providers.JsonRpcProvider(httpRPC);
-        this.ws = new WebSocket(wsRPC);
+        this.ws;
+        this.wsUrl = wsRPC;
+        // Init contract then connect wallet to get new Contract object
+        this.setUpContract = new ethers.Contract(contractAddress, ABI, this.provider);
+        this.signContract = this.setUpContract.connect(this.wallet);
+
+        /*         this.ws.onopen = (event) => {
+                    console.log("CONNECTING...")
+        
+                    // Send request for pending txn to contract from alchemy
+                    this.ws.send(JSON.stringify({
+                        "jsonrpc": "2.0", "id": 2,
+                        "method": "eth_subscribe",
+                        "params": ["alchemy_pendingTransactions",
+                            {
+                                "toAddress": this.signContract.address,
+                                "hashesOnly": false
+                            }]
+                    }));
+                } */
 
         this.wallet = new ethers.Wallet(privateKey, this.provider);
-
+        console.log(ABI)
         // Init contract then connect wallet to get new Contract object
         this.setUpContract = new ethers.Contract(contractAddress, ABI, this.provider);
         this.signContract = this.setUpContract.connect(this.wallet);
@@ -29,10 +48,12 @@ export default class TaskInstance {
         this.maxFeePerGas = ethers.BigNumber.from(weiMaxGas);
         this.maxPriorityFeePerGas = ethers.BigNumber.from(weiMaxPriority);
         this.args = args;
+
     }
 
     init() {
-        this.ws.onopen = () => {
+        console.log("init called")
+        this.ws.onopen = (event) => {
             console.log("CONNECTING...")
 
             // Send request for pending txn to contract from alchemy
@@ -49,6 +70,21 @@ export default class TaskInstance {
     }
 
     async monitor() {
+        this.ws = new WebSocket(this.wsUrl);
+        this.ws.onopen = (event) => {
+            console.log("CONNECTING...")
+
+            // Send request for pending txn to contract from alchemy
+            this.ws.send(JSON.stringify({
+                "jsonrpc": "2.0", "id": 2,
+                "method": "eth_subscribe",
+                "params": ["alchemy_pendingTransactions",
+                    {
+                        "toAddress": this.signContract.address,
+                        "hashesOnly": false
+                    }]
+            }));
+        }
         this.ws.onmessage = (msg) => {
             let msgData = JSON.parse(msg.data);
 

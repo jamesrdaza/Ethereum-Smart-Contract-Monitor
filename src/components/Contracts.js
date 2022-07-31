@@ -1,6 +1,7 @@
 import ContractContext from '../Contexts/ContractContext.js'
 import Contract from './Contract.js'
 import { useContext, useState, useRef } from 'react'
+import { storeContract } from '../indexedDB/BotDB.js';
 
 const Contracts = () => {
 
@@ -14,7 +15,7 @@ const Contracts = () => {
 
     // Arguments and ABI to pass onto the TaskInstance
     const { setParams } = useContext(ContractContext);
-    const { setContractABI } = useContext(ContractContext);
+    const { contractABI, setContractABI } = useContext(ContractContext);
 
     const addrInput = useRef();
     const mintInput = useRef();
@@ -29,6 +30,7 @@ const Contracts = () => {
                     // Using temp variable because setState is async
                     let ABI = (JSON.parse(responseJson.result))
                     setContractABI(ABI); // Setting ABI st
+
 
                     let funcs = {};
 
@@ -54,8 +56,8 @@ const Contracts = () => {
     const saveContract = () => {
         // Adding params to pass to Task State (Change later to one state)
         setParams(funcs[mintInput.current.value].inputs);
-        addContract(addrInput.current.value, mintInput.current.value, flipInput.current.value);
-
+        addContract(addrInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
+        storeContract(addrInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
         clearFuncs(); // Clearing dropdown options after saving
         setHidden(true); // Make function fields appear
 

@@ -14,8 +14,8 @@ export function ContractProvider({ children }) {
     const [params, setParams] = useState([]); // Function parameters
     const [id, setId] = useState(0); // Temp Incremental ID's will change later
 
-    const addContract = (address, mintFunction, flipFunction) => {
-        setContract((prev) => [...prev, { id, address, mintFunction, flipFunction }])
+    const addContract = (address, abi, mintFunction, flipFunction, params) => {
+        setContract((prev) => [...prev, { id, address, abi, mintFunction, flipFunction, params }])
         setId(id + 1);
     };
 

@@ -1,12 +1,13 @@
-import Wallets from './components/Wallets'
+import Wallets from './components/Wallets.js'
 import Contracts from './components/Contracts.js';
 import Tasks from './components/Tasks.js'
-import { WalletProvider } from './Contexts/WalletContext';
-import { ContractProvider } from './Contexts/ContractContext.js';
-import { TaskProvider } from './Contexts/TasksContext.js';
 import './App.css';
 import './fonts/Montserrat-VariableFont_wght.ttf'
-
+import { initDB } from "./indexedDB/BotDB.js";
+import WalletContext from './Contexts/WalletContext';
+import { useContext, useEffect } from 'react';
+import ContractContext from './Contexts/ContractContext.js';
+import TaskContext from './Contexts/TasksContext.js';
 /*
   TODO:
   Valid input checks
@@ -23,23 +24,29 @@ import './fonts/Montserrat-VariableFont_wght.ttf'
   MAJOR: Implement indexedDB for local storage while keeping private keys safe  
 */
 
+
+
 function App() {
+  const { addWallet } = useContext(WalletContext);
+  const { addContract } = useContext(ContractContext);
+  const { addTask, setParamState } = useContext(TaskContext)
+
+  useEffect(() => {
+    initDB({ addWallet, addContract, addTask });
+
+  }, []);
   return (
     <div className="MintingBot" >
-      <WalletProvider>
-        <ContractProvider>
-          <TaskProvider>
-            <header className="minting-bot">
-              <h2>
-                Minting Bot
-              </h2>
-            </header>
-            <Wallets />
-            <Contracts />
-            <Tasks />
-          </TaskProvider>
-        </ContractProvider>
-      </WalletProvider>
+
+      <header className="minting-bot">
+        <h2>
+          Minting Bot
+        </h2>
+      </header>
+      <Wallets />
+      <Contracts />
+      <Tasks />
+
     </div>
   );
 }
