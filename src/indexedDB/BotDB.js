@@ -1,14 +1,21 @@
+/**
+ * TODO: 
+ *      Pack Things neater (too many loose parameters)
+ *      Get delete functionality in sync with UI (can't sync keys)
+ */
+
 const dbName = "botDB";
 
 export function initDB(setFuncs) {
     const request = window.indexedDB.open(dbName, 1);
 
+    // Create database if one does not exist
     request.onupgradeneeded = () => {
         const db = request.result;
 
-        const walletStore = db.createObjectStore("wallets", { autoIncrement: true });
+        const walletStore = db.createObjectStore("wallets", { keyPath: "address" });
         walletStore.createIndex("privateKey", "privateKey");
-        walletStore.createIndex("address", "address");
+        //walletStore.createIndex("address", "address");
 
         const contractStore = db.createObjectStore("contracts", { autoIncrement: true });
         /* contractStore.createIndex("contractName", "name", { unique: false }); */
@@ -28,13 +35,15 @@ export function initDB(setFuncs) {
         taskStore.createIndex("maxGasFee", "maxGasFee", { unique: false });
         taskStore.createIndex("maxPriorityFee", "maxPriorityFee", { unique: false });
         taskStore.createIndex("arguments", "args");
-
-
     }
 
+    // If database exists load all Wallets, Contracts, Tasks
     request.onsuccess = () => {
+
+        // Load database object
         let db = request.result;
 
+        // Create cursor to iterate over each element and add them to UI state through callbacks
         let wTxn = db.transaction(["wallets"], "readonly");
         let wallets = wTxn.objectStore("wallets");
         let walletWalk = wallets.openCursor(null, "next");
@@ -43,8 +52,6 @@ export function initDB(setFuncs) {
             if (walletCursor) {
                 setFuncs.addWallet(walletCursor.value.privateKey, walletCursor.value.address);
             }
-
-
         }
 
         let cTxn = db.transaction(["contracts"], "readonly");
@@ -81,6 +88,7 @@ export function initDB(setFuncs) {
     }
 }
 
+// Potential callback to setId
 export function storeWallet(pk, addr) {
     let request = window.indexedDB.open("botDB");
 
@@ -89,13 +97,13 @@ export function storeWallet(pk, addr) {
         let transaction = db.transaction(["wallets"], "readwrite");
         let store = transaction.objectStore("wallets");
 
-        let storeRequest = store.add({ privateKey: pk, address: addr });
+        // Add given private key and address
+        let storeRequest = store.add({ address: addr, privateKey: pk });
 
         storeRequest.onsuccess = function () {
             console.log("Succesfully Added Wallet");
         };
 
-        //unable to add bullet, returns -1
         storeRequest.onerror = function () {
             console.error("Error: Could not add wallet")
         };
@@ -111,14 +119,16 @@ export function storeWallet(pk, addr) {
     };
 }
 
-export function deleteWallet(key) {
-    let request = window.indexedDB.open(DATABASENAME);
+// Not yet tested
+export function destroyWallet(addr) {
+    let request = window.indexedDB.open(dbName);
 
     request.onsuccess = function () {
         let db = request.result;
         let transaction = db.transaction(["wallets"], "readwrite");
         let objStore = transaction.objectStore("wallets");
-        let deleteRequest = objStore.delete(id);
+        console.log(addr);
+        let deleteRequest = objStore.delete(addr);
 
         //Bullet object successfully deleted
         deleteRequest.onsuccess = function () {

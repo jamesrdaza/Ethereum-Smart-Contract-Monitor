@@ -2,6 +2,7 @@ import ContractContext from '../Contexts/ContractContext.js'
 import Contract from './Contract.js'
 import { useContext, useState, useRef } from 'react'
 import { storeContract } from '../indexedDB/BotDB.js';
+import { ethers } from 'ethers';
 
 const Contracts = () => {
 
@@ -23,35 +24,40 @@ const Contracts = () => {
 
     // Fetch contract params and ABI
     const getContract = () => {
-        fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
-            .then((response) => {
-                response.json().then((responseJson) => {
+        if (ethers.utils.isAddress(addrInput.current.value)) {
+            fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
+                .then((response) => {
+                    response.json().then((responseJson) => {
 
-                    // Using temp variable because setState is async
-                    let ABI = (JSON.parse(responseJson.result))
-                    setContractABI(ABI); // Setting ABI st
+                        // Using temp variable because setState is async
+                        let ABI = (JSON.parse(responseJson.result))
+                        setContractABI(ABI); // Setting ABI st
 
 
-                    let funcs = {};
+                        let funcs = {};
 
-                    // Loops through ABI objects and push the functions
-                    for (let i = 0; i < ABI.length; i++) {
-                        // name property that has inputs are function calls
-                        if (ABI[i]['inputs'].length > 0 && ABI[i]['name'] !== undefined) {
-                            funcs[ABI[i]['name']] = ABI[i];
+                        // Loops through ABI objects and push the functions
+                        for (let i = 0; i < ABI.length; i++) {
+                            // name property that has inputs are function calls
+                            if (ABI[i]['inputs'].length > 0 && ABI[i]['name'] !== undefined) {
+                                funcs[ABI[i]['name']] = ABI[i];
+                            }
                         }
-                    }
 
-                    // Set Dropdown Options
-                    setFuncs(funcs);
+                        // Set Dropdown Options
+                        setFuncs(funcs);
 
-                    // Get functions
-                    Object.keys(funcs).forEach((key) => {
-                        addFunc(funcs[key]);
-                    });
-                    setHidden(false); // Hide function fields
+                        // Get functions
+                        Object.keys(funcs).forEach((key) => {
+                            addFunc(funcs[key]);
+                        });
+                        setHidden(false); // Hide function fields
+                    })
                 })
-            })
+        }
+        else {
+            alert("Not a valid address");
+        }
     }
     const saveContract = () => {
         // Adding params to pass to Task State (Change later to one state)
@@ -70,16 +76,16 @@ const Contracts = () => {
             <button onClick={getContract}>Add Contract</button> <br></br>
 
             <div style={{ visibility: isHidden ? 'hidden' : 'visible' }}>
-                <select ref={mintInput}>
-                    <option disabled selected>Select Mint Function</option>
+                <select defaultValue={"DEFAULT"} ref={mintInput}>
+                    <option disabled value="DEFAULT">Select Mint Function</option>
                     {
                         fetchFuncs.map((func) => (
                             <option>{func.name}</option>
                         ))
                     }
                 </select>
-                <select ref={flipInput}>
-                    <option disabled selected>Select Flip Function</option>
+                <select defaultValue={"DEFAULT"} ref={flipInput}>
+                    <option disabled value="DEFAULT">Select Flip Function</option>
                     {
                         fetchFuncs.map((func) => (
                             <option>{func.name}</option>

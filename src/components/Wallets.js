@@ -3,7 +3,7 @@ import Wallet from './Wallet.js'
 import { useContext } from 'react';
 import { useRef } from 'react';
 import { storeWallet } from '../indexedDB/BotDB.js';
-
+import { ethers } from 'ethers';
 
 const Wallets = () => {
     const { wallets, addWallet } = useContext(WalletContext);
@@ -12,9 +12,16 @@ const Wallets = () => {
     const walletInput = useRef();
 
     const submitWallet = () => {
-        addWallet(pkInput.current.value, walletInput.current.value);
-        storeWallet(pkInput.current.value, walletInput.current.value);
+        if (ethers.utils.isAddress(walletInput.current.value)) {
+            addWallet(pkInput.current.value, walletInput.current.value);
+            storeWallet(pkInput.current.value, walletInput.current.value);
+        }
+        else {
+            alert("Not a valid wallet address");
+        }
     }
+
+
     return (
         <div className='container'>
             Address<br></br>
