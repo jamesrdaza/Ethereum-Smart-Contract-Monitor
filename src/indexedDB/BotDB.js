@@ -18,7 +18,7 @@ export function initDB(setFuncs) {
         //walletStore.createIndex("address", "address");
 
         const contractStore = db.createObjectStore("contracts", { keyPath: "address" });
-        /* contractStore.createIndex("contractName", "name", { unique: false }); */
+        contractStore.createIndex("contractName", "name", { unique: false });
         contractStore.createIndex("address", "address");
         contractStore.createIndex("ABI", "ABI");
         contractStore.createIndex("flipFunction", "flipFunction");
@@ -64,6 +64,7 @@ export function initDB(setFuncs) {
             if (contractCursor != null) {
                 setFuncs.addContract(
                     contractCursor.value.address,
+                    contractCursor.value.name,
                     contractCursor.value.ABI,
                     contractCursor.value.mintFunction,
                     contractCursor.value.flipFunction,
@@ -149,7 +150,7 @@ export function destroyWallet(addr) {
     }
 }
 
-export function storeContract(addr, abi, mint, flip, args) {
+export function storeContract(addr, name, abi, mint, flip, args) {
     let request = window.indexedDB.open("botDB");
 
     request.onsuccess = function () {
@@ -157,7 +158,7 @@ export function storeContract(addr, abi, mint, flip, args) {
         let transaction = db.transaction(["contracts"], "readwrite");
         let store = transaction.objectStore("contracts");
 
-        let storeRequest = store.add({ address: addr, ABI: abi, mintFunction: mint, flipFunction: flip, arguments: args });
+        let storeRequest = store.add({ address: addr, contractName: name, ABI: abi, mintFunction: mint, flipFunction: flip, arguments: args });
 
         storeRequest.onsuccess = function () {
             console.log("Succesfully Added Contract");

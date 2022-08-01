@@ -14,7 +14,7 @@ const Contract = ({ contract }) => {
     return (
         <div className="itemContainer">
             <div style={{ width: "90%" }}>
-                <p style={{ marginBottom: "1px" }}>Contract {contract.id}</p>
+                <p style={{ marginBottom: "1px" }}>{contract.name}</p>
                 <p style={{ marginTop: "1px" }}>{contract.address}</p>
             </div>
             <button onClick={edit} style={{ width: "10%", margin: "5px" }}>Edit</button>

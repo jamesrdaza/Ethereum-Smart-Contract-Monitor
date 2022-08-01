@@ -21,6 +21,7 @@ const Contracts = () => {
     const addrInput = useRef();
     const mintInput = useRef();
     const flipInput = useRef();
+    const nameInput = useRef();
 
     // Fetch contract params and ABI
     const getContract = () => {
@@ -70,8 +71,8 @@ const Contracts = () => {
     const saveContract = () => {
         // Adding params to pass to Task State (Change later to one state)
         setParams(funcs[mintInput.current.value].inputs);
-        addContract(addrInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
-        storeContract(addrInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
+        addContract(addrInput.current.value, nameInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
+        storeContract(addrInput.current.value, nameInput.current.value, contractABI, mintInput.current.value, flipInput.current.value, funcs[mintInput.current.value].inputs);
         clearFuncs(); // Clearing dropdown options after saving
         setHidden(true); // Make function fields appear
 
@@ -79,6 +80,8 @@ const Contracts = () => {
 
     return (
         <div className='container'>
+            Contract Name <br></br>
+            <input type='text' ref={nameInput}></input> <br></br>
             Contract Address <br></br>
             <input type='text' ref={addrInput}></input> <br></br>
             <button onClick={getContract}>Add Contract</button> <br></br>

@@ -13,8 +13,8 @@ export function ContractProvider({ children }) {
     const [isHidden, setHidden] = useState(true);
     const [params, setParams] = useState([]); // Function parameters
 
-    const addContract = (address, abi, mintFunction, flipFunction, params) => {
-        setContract((prev) => [...prev, { address, abi, mintFunction, flipFunction, params }])
+    const addContract = (address, name, abi, mintFunction, flipFunction, params) => {
+        setContract((prev) => [...prev, { address, name, abi, mintFunction, flipFunction, params }])
     };
 
     const removeContract = (address) => {
