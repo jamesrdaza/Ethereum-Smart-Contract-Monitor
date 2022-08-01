@@ -27,11 +27,12 @@ const Contracts = () => {
 
         // Check if contract address is valid
         if (ethers.utils.isAddress(addrInput.current.value)) {
-            fetch(`https://api.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
+            fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
                 .then((response) => {
                     response.json().then((responseJson) => {
 
                         // Using temp variable because setState is async
+                        console.log(responseJson.result);
                         let ABI = (JSON.parse(responseJson.result))
                         setContractABI(ABI); // Setting ABI 
 
@@ -57,6 +58,9 @@ const Contracts = () => {
 
                         setHidden(false); // Hide function fields
                     })
+                        .catch((err) => {
+                            console.error(err);
+                        })
                 })
         }
         else {

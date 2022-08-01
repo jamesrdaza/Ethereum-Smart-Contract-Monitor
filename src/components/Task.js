@@ -3,8 +3,9 @@ import TaskContext from '../Contexts/TasksContext.js';
 import { useContext, useEffect } from 'react';
 import ContractContext from '../Contexts/ContractContext.js';
 import { destroyTask } from '../indexedDB/BotDB.js';
-import { useState, CSSProperties } from "react";
+import { useState, CSSProperties, useRef } from "react";
 import RotateLoader from "react-spinners/RotateLoader";
+import Countdown from 'react-countdown';
 
 const override = {
     display: "block",
@@ -16,15 +17,20 @@ const Task = ({ task }) => {
     const { instances, addInstance, deleteInstance, deleteTask } = useContext(TaskContext);
     let [loading, setLoading] = useState(false);
     let [color, setColor] = useState("#ffffff");
+    let countdownRef = useRef();
 
     useEffect(() => {
 
         // Hardcoded RPC's will allow options later
-        let httpRPC = "https://eth-mainnet.g.alchemy.com/v2/ufeyHWUdJJu9vurqgYKOli1zmLWgJoXs";
-        let wsRPC = "wss://eth-mainnet.g.alchemy.com/v2/ufeyHWUdJJu9vurqgYKOli1zmLWgJoXs";
+        /* let httpRPC = "https://eth-mainnet.g.alchemy.com/v2/ufeyHWUdJJu9vurqgYKOli1zmLWgJoXs";
+        let wsRPC = "wss://eth-mainnet.g.alchemy.com/v2/ufeyHWUdJJu9vurqgYKOli1zmLWgJoXs"; */
+
+        let httpRPC = "https://eth-rinkeby.alchemyapi.io/v2/5DPlF1-TT85CmLvjEuDXaIR8YFyLNg8G";
+        let wsRPC = "wss://eth-rinkeby.alchemyapi.io/v2/5DPlF1-TT85CmLvjEuDXaIR8YFyLNg8G";
+
         setLoading(false);
         // TODO: Change constructor to object so my eyes don't hurt looking at this declaration
-        const newInstance = new TaskInstance(task.wallet.pk, task.contract.address, task.contract.abi, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params);
+        const newInstance = new TaskInstance(task.wallet.pk, task.contract.address, task.contract.abi, httpRPC, wsRPC, task.contract.mintFunction, task.contract.flipFunction, task.value, task.maxBaseFee, task.maxPriorityFee, task.params, task.isTimed, task.time);
         addInstance(task.uuid, newInstance);
 
         //Check dependency array
@@ -32,18 +38,25 @@ const Task = ({ task }) => {
 
     // Execute task
     const execute = () => {
-        setLoading(true)
+        const taskInstance = instances[task.uuid];
+        console.log(taskInstance);
 
-        /* const taskInstance = instances[task.uuid];
-        console.log(taskInstance)
-        taskInstance.monitor(); */
+
+        if (task.isTimed) {
+            countdownRef.current.start();
+            taskInstance.waiting();
+        }
+        else {
+            taskInstance.monitor();
+            setLoading(true)
+        }
     }
 
     //
     const removeTask = () => {
         destroyTask(task.uuid);
         deleteInstance(task.uuid);
-        deleteTask(task.uuid)
+        deleteTask(task.uuid);
     }
 
     const StopTask = () => {
@@ -66,6 +79,9 @@ const Task = ({ task }) => {
                 <button style={{ margin: "5px", width: "10%" }} onClick={StopTask}>Stop</button>
                 <button style={{ margin: "5px", width: "10%" }} onClick={removeTask}>Delete</button>
 
+            </div>
+            <div style={{ height: "15%", margin: "auto", display: !loading ? "block" : "none", visibility: !loading ? "visible" : "hidden" }}>
+                <Countdown date={task.time} control={true} onComplete={() => setLoading(!loading)} />
             </div>
             <RotateLoader color={color} loading={loading} cssOverride={override} />
         </div>

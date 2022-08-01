@@ -8,8 +8,8 @@ export function TaskProvider({ children }) {
     const [paramState, setParamState] = useState([]); // Parameters to get filled by contract parameters
     const [isHidden, setHidden] = useState(true);
 
-    const addTask = (uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params) => {
-        setTask((prev) => [...prev, { uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params }])
+    const addTask = (uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params, isTimed, time) => {
+        setTask((prev) => [...prev, { uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params, isTimed, time }])
     };
 
     const deleteTask = (uuid) => {
@@ -28,7 +28,7 @@ export function TaskProvider({ children }) {
 
     const deleteInstance = (uuid) => {
         let tempInst = instances;
-        delete tempInst.uuid;
+        delete tempInst[uuid];
         setInstances(tempInst);
     }
 

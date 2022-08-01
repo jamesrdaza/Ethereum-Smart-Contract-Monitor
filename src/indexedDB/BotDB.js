@@ -35,6 +35,8 @@ export function initDB(setFuncs) {
         taskStore.createIndex("maxGasFee", "maxGasFee", { unique: false });
         taskStore.createIndex("maxPriorityFee", "maxPriorityFee", { unique: false });
         taskStore.createIndex("arguments", "args");
+        taskStore.createIndex("isTimed", "isTimed");
+        taskStore.createIndex("execTime", "execTime");
     }
 
     // If database exists load all Wallets, Contracts, Tasks
@@ -79,7 +81,7 @@ export function initDB(setFuncs) {
 
                 setFuncs.addTask(taskCursor.key, { pk: taskCursor.value.privateKey, address: "0x" },
                     { address: taskCursor.value.contractAddress, abi: taskCursor.value.ABI, mintFunction: taskCursor.value.mintFunction, flipFunction: taskCursor.value.flipFunction, params: taskCursor.value.arguments },
-                    taskCursor.value.maxGasFee, taskCursor.value.maxPriorityFee, taskCursor.value.value, taskCursor.value.arguments);
+                    taskCursor.value.maxGasFee, taskCursor.value.maxPriorityFee, taskCursor.value.value, taskCursor.value.arguments, taskCursor.value.isTimed, taskCursor.value.execTime);
             }
         }
     }
@@ -204,7 +206,7 @@ export function destroyContract(addr) {
     }
 }
 
-export function storeTask(uuid, pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args) {
+export function storeTask(uuid, pk, cAddr, abi, mint, flip, val, maxGas, maxPrio, args, timed, time) {
     let request = window.indexedDB.open("botDB");
 
     request.onsuccess = function () {
@@ -212,7 +214,7 @@ export function storeTask(uuid, pk, cAddr, abi, mint, flip, val, maxGas, maxPrio
         let transaction = db.transaction(["tasks"], "readwrite");
         let store = transaction.objectStore("tasks");
 
-        let storeRequest = store.add({ privateKey: pk, contractAddress: cAddr, ABI: abi, mintFunction: mint, flipFunction: flip, value: val, maxGasFee: maxGas, maxPriorityFee: maxPrio, arguments: args }, uuid);
+        let storeRequest = store.add({ privateKey: pk, contractAddress: cAddr, ABI: abi, mintFunction: mint, flipFunction: flip, value: val, maxGasFee: maxGas, maxPriorityFee: maxPrio, arguments: args, isTimed: timed, execTime: time }, uuid);
 
         storeRequest.onsuccess = function () {
             console.log("Succesfully Added Task");

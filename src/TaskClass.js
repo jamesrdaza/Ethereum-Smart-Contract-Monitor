@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 export default class TaskInstance {
-    constructor(privateKey, contractAddress, ABI, httpRPC, wsRPC, mintFunction, flipFunction, value, maxGasFee, maxPriorityFee, args) {
+    constructor(privateKey, contractAddress, ABI, httpRPC, wsRPC, mintFunction, flipFunction, value, maxGasFee, maxPriorityFee, args, isTimed, time) {
         // HTTP RPC and WS that retreive and send data through alchemy api
         this.provider = new ethers.providers.JsonRpcProvider(httpRPC);
         this.ws;
@@ -35,6 +35,10 @@ export default class TaskInstance {
         this.maxFeePerGas = ethers.BigNumber.from(weiMaxGas);
         this.maxPriorityFeePerGas = ethers.BigNumber.from(weiMaxPriority);
         this.args = args;
+
+        this.isTimed = isTimed;
+        this.time = time;
+        this.currentTime = new Date();
 
     }
 
@@ -107,6 +111,15 @@ export default class TaskInstance {
 
     stop() {
         this.go = false;
+    }
+
+    async waiting() {
+        this.go = true;
+        while (this.isTimed && (Date.now() < this.time) && this.go) {
+            await this.wait(500);
+            console.log(Date.now() < this.time);
+        }
+        this.monitor();
     }
 
 };
