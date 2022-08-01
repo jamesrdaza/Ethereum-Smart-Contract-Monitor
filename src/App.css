@@ -124,12 +124,12 @@ option:hover {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgb(44, 44, 44);
+  background: rgb(0, 0, 0);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: black;
+  background: rgb(66, 66, 66);
 }
 
 /* Handle on hover */

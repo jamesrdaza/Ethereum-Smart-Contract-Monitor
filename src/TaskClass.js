@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 export default class TaskInstance {
-    constructor(privateKey, contractAddress, ABI, httpRPC, wsRPC, mintFunction, flipFunction, value, maxGasFee, maxPriorityFee, args, isTimed, time) {
+    constructor(privateKey, contractAddress, ABI, httpRPC, wsRPC, mintFunction, flipFunction, value, maxGasFee, maxPriorityFee, args, isTimed, time, loadCallback) {
         // HTTP RPC and WS that retreive and send data through alchemy api
         this.provider = new ethers.providers.JsonRpcProvider(httpRPC);
         this.ws;
@@ -40,11 +40,14 @@ export default class TaskInstance {
         this.time = time;
         this.currentTime = new Date();
 
+        this.setLoading = loadCallback;
+
     }
 
     async monitor() {
         this.go = true;
         this.ws = new WebSocket(this.wsUrl);
+        this.setLoading(true);
         this.ws.onopen = (event) => {
             console.log("CONNECTING...")
 
@@ -76,10 +79,11 @@ export default class TaskInstance {
                         maxPriorityFeePerGas: this.maxPriorityFeePerGas
                     })
                         // Debugs for now
-                        .then(txnReceipt => { console.log("Completed Printing Receipt..."); console.log(txnReceipt) })
+                        .then(txnReceipt => { console.log("Completed Printing Receipt..."); console.log(txnReceipt); this.setLoading(false) })
                         .catch(async () => {
                             await this.wait(500);
                             await this.retry();
+
                         });
                 }
             }
@@ -97,7 +101,7 @@ export default class TaskInstance {
                 maxFeePerGas: this.maxFeePerGas,
                 maxPriorityFeePerGas: this.maxPriorityFeePerGas
             })
-                .then(txnReceipt => { console.log("Completed Printing Receipt..."); console.log(txnReceipt) })
+                .then((txnReceipt) => { console.log("Completed Printing Receipt..."); console.log(txnReceipt); this.setLoading(false) })
                 .catch(async () => {
                     await this.wait(500);
                     await this.retry();
@@ -115,6 +119,7 @@ export default class TaskInstance {
 
     async waiting() {
         this.go = true;
+        this.setLoading(false);
         while (this.isTimed && (Date.now() < this.time) && this.go) {
             await this.wait(500);
             console.log(Date.now() < this.time);

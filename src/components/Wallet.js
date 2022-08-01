@@ -2,12 +2,22 @@ import { useContext, useEffect, useState } from "react";
 import WalletContext from "../Contexts/WalletContext";
 import { destroyWallet } from "../indexedDB/BotDB";
 import { ethers } from "ethers";
+import SettingsContext from "../Contexts/SettingsContext";
 
 const Wallet = ({ wallet }) => {
+    const { network, setNetwork } = useContext(SettingsContext);
     const [balance, setBalance] = useState("0");
 
+    // Gets the balance of the wallet
     const getBalance = () => {
-        let provider = ethers.getDefaultProvider("rinkeby");
+        let provider;
+        if (network === "rinkeby") {
+            provider = ethers.getDefaultProvider("rinkeby");
+        }
+        else if (network === "mainnet") {
+            provider = ethers.getDefaultProvider("mainnet");
+        }
+
         provider.getBalance(wallet.address).then((balance) => {
             const eth = ethers.utils.formatEther(balance);
             setBalance(parseFloat(eth).toFixed(3));
@@ -16,7 +26,7 @@ const Wallet = ({ wallet }) => {
 
     useEffect(() => {
         getBalance();
-    })
+    }, [])
 
     const { deleteWallet } = useContext(WalletContext);
 
@@ -29,7 +39,7 @@ const Wallet = ({ wallet }) => {
     return (
         <div className="itemContainer">
             <div style={{ width: "80%" }}>
-                <p style={{ marginBottom: "1px" }}>Wallet  {balance}<p style={{ fontFamily: "sans-serif", display: "inline" }}> Ξ</p></p>
+                <p style={{ marginBottom: "1px" }}>Wallet  {balance}<span style={{ fontFamily: "sans-serif", display: "inline" }}> Ξ</span></p>
                 <p style={{ marginTop: "1px" }}>{wallet.address} </p>
             </div>
 

@@ -5,18 +5,20 @@ import App from './App';
 import { WalletProvider } from './Contexts/WalletContext.js';
 import { ContractProvider } from './Contexts/ContractContext.js';
 import { TaskProvider } from './Contexts/TasksContext.js';
+import { SettingsProvider } from "./Contexts/SettingsContext.js";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-
-  <WalletProvider>
-    <ContractProvider>
-      <TaskProvider>
-        <App />
-      </TaskProvider>
-    </ContractProvider>
-  </WalletProvider>
+  <SettingsProvider>
+    <WalletProvider>
+      <ContractProvider>
+        <TaskProvider>
+          <App />
+        </TaskProvider>
+      </ContractProvider>
+    </WalletProvider>
+  </SettingsProvider>
 
 );
 

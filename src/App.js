@@ -8,16 +8,17 @@ import WalletContext from './Contexts/WalletContext';
 import { useContext, useEffect } from 'react';
 import ContractContext from './Contexts/ContractContext.js';
 import TaskContext from './Contexts/TasksContext.js';
+import Alerts from './components/Alerts.js';
 /*
   TODO:
   Valid Private Key and Task Inputs
   Clearing used input fields
   Add edit button functionality
   Clean up taskClass
-  Fix random errors
   Task indicators 
   Search multiple blocks not just pending
   Catch errors from async functions 
+  alerts
 
   MAJOR: encrypt private keys with a password 
 */
@@ -33,15 +34,18 @@ function App() {
   }, []);
 
   return (
-    <div className="MintingBot" >
-      <header className="minting-bot">
-        <h2 style={{ overflow: "hidden" }}>
-          Minting Bot
-        </h2>
-      </header>
-      <Wallets />
-      <Contracts />
-      <Tasks />
+    <div className="page">
+      <div className="MintingBot" >
+        <header className="minting-bot">
+          <h2 style={{ overflow: "hidden" }}>
+            Minting Bot
+          </h2>
+        </header>
+        <Wallets />
+        <Contracts />
+        <Tasks />
+      </div>
+      {/* <Alerts /> */}
     </div>
   );
 }

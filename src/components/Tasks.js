@@ -76,7 +76,7 @@ const Tasks = () => {
                 <option >Select Contract</option>
                 {
                     contracts.map((contract) => (
-                        <option key={contract.address}>{contract.name}</option>
+                        <option key={contract.address} value={contract.address}>{contract.name}</option>
                     ))
                 }
             </select>

@@ -3,8 +3,11 @@ import Contract from './Contract.js'
 import { storeContract } from '../indexedDB/BotDB.js';
 import ContractContext from '../Contexts/ContractContext.js'
 import { ethers } from 'ethers';
+import SettingsContext from '../Contexts/SettingsContext.js';
 
 const Contracts = () => {
+
+    const { network, setNetwork } = useContext(SettingsContext);
 
     // Functions fetched to display
     const { fetchFuncs, addFunc, clearFuncs } = useContext(ContractContext);
@@ -28,6 +31,7 @@ const Contracts = () => {
 
         // Check if contract address is valid
         if (ethers.utils.isAddress(addrInput.current.value)) {
+
             fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
                 .then((response) => {
                     response.json().then((responseJson) => {

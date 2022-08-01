@@ -64,7 +64,7 @@ export function initDB(setFuncs) {
             if (contractCursor != null) {
                 setFuncs.addContract(
                     contractCursor.value.address,
-                    contractCursor.value.name,
+                    contractCursor.value.contractName,
                     contractCursor.value.ABI,
                     contractCursor.value.mintFunction,
                     contractCursor.value.flipFunction,

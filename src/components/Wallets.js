@@ -22,6 +22,20 @@ const Wallets = () => {
         }
     }
 
+
+    // Possibly use mnemonic phrase
+    const createWallet = () => {
+        // Will encrypt via password later
+        let newWallet = ethers.Wallet.createRandom();
+        addWallet(newWallet.privateKey, newWallet.address);
+        storeWallet(newWallet.privateKey, newWallet.address);
+    }
+
+    // Will implement disperse either custom contract or embed disperse.app
+    const disperse = () => {
+
+    }
+
     return (
         <div className='container'>
             Address<br></br>
@@ -30,7 +44,7 @@ const Wallets = () => {
             <input type='password' ref={pkInput}></input> <br></br>
             <button onClick={submitWallet}>Save Wallet</button>
             <hr style={{ width: "95%" }}></hr>
-            <h3>Wallets</h3>
+            <div style={{ display: "flex" }}><h3 style={{ width: "83%" }}>Wallets</h3> <button onClick={createWallet} style={{ width: "17%" }}>Create Wallet</button></div>
             {
                 wallets.map((wallet) => (
                     <Wallet key={wallet.address} wallet={wallet} />
