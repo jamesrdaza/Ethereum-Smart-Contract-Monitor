@@ -4,6 +4,7 @@ import { destroyWallet } from "../indexedDB/BotDB";
 
 const Wallet = ({ wallet }) => {
     const { deleteWallet } = useContext(WalletContext);
+
     const removeWallet = () => {
 
         //Remove from database first so no render then remove from state

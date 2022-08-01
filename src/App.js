@@ -10,43 +10,38 @@ import ContractContext from './Contexts/ContractContext.js';
 import TaskContext from './Contexts/TasksContext.js';
 /*
   TODO:
-  Valid input checks
+  Valid Private Key and Task Inputs
   Clearing used input fields
-  Fix item id's
-  Add delete and edit button functionality
+  Add edit button functionality
   Clean up taskClass
   Fix random errors
   Task indicators 
-  Task retries
   Search multiple blocks not just pending
   Catch errors from async functions 
 
-  MAJOR: Implement indexedDB for local storage while keeping private keys safe  
+  MAJOR: encrypt private keys with a password 
 */
-
-
 
 function App() {
   const { addWallet } = useContext(WalletContext);
   const { addContract } = useContext(ContractContext);
-  const { addTask, setParamState } = useContext(TaskContext)
+  const { addTask } = useContext(TaskContext)
 
+  // Load data from indexedDB
   useEffect(() => {
     initDB({ addWallet, addContract, addTask });
-
   }, []);
+
   return (
     <div className="MintingBot" >
-
       <header className="minting-bot">
-        <h2>
+        <h2 style={{ overflow: "hidden" }}>
           Minting Bot
         </h2>
       </header>
       <Wallets />
       <Contracts />
       <Tasks />
-
     </div>
   );
 }

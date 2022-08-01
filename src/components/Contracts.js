@@ -1,7 +1,7 @@
-import ContractContext from '../Contexts/ContractContext.js'
-import Contract from './Contract.js'
 import { useContext, useState, useRef } from 'react'
+import Contract from './Contract.js'
 import { storeContract } from '../indexedDB/BotDB.js';
+import ContractContext from '../Contexts/ContractContext.js'
 import { ethers } from 'ethers';
 
 const Contracts = () => {
@@ -24,16 +24,19 @@ const Contracts = () => {
 
     // Fetch contract params and ABI
     const getContract = () => {
+
+        // Check if contract address is valid
         if (ethers.utils.isAddress(addrInput.current.value)) {
-            fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
+            fetch(`https://api.etherscan.io/api?module=contract&action=getabi&address=${addrInput.current.value}&apikey=QNKM5HM4YFG87MS5PHZKB3NI43N83GX1MB`) //Remove API Key later
                 .then((response) => {
                     response.json().then((responseJson) => {
 
                         // Using temp variable because setState is async
                         let ABI = (JSON.parse(responseJson.result))
-                        setContractABI(ABI); // Setting ABI st
+                        setContractABI(ABI); // Setting ABI 
 
-
+                        // TODO: Flip functions gather bool return functions
+                        // Gather all functions in here
                         let funcs = {};
 
                         // Loops through ABI objects and push the functions
@@ -51,6 +54,7 @@ const Contracts = () => {
                         Object.keys(funcs).forEach((key) => {
                             addFunc(funcs[key]);
                         });
+
                         setHidden(false); // Hide function fields
                     })
                 })
@@ -75,8 +79,8 @@ const Contracts = () => {
             <input type='text' ref={addrInput}></input> <br></br>
             <button onClick={getContract}>Add Contract</button> <br></br>
 
-            <div style={{ visibility: isHidden ? 'hidden' : 'visible' }}>
-                <select defaultValue={"DEFAULT"} ref={mintInput}>
+            <div style={{ display: isHidden ? 'none' : 'flex', visibility: isHidden ? 'hidden' : 'visible', flexWrap: "wrap", justifyContent: "center" }}>
+                <select style={{ width: "95%", marginBottom: "1%" }} defaultValue={"DEFAULT"} ref={mintInput}>
                     <option disabled value="DEFAULT">Select Mint Function</option>
                     {
                         fetchFuncs.map((func) => (
@@ -84,7 +88,7 @@ const Contracts = () => {
                         ))
                     }
                 </select>
-                <select defaultValue={"DEFAULT"} ref={flipInput}>
+                <select style={{ width: "95%", marginBottom: "1%" }} defaultValue={"DEFAULT"} ref={flipInput}>
                     <option disabled value="DEFAULT">Select Flip Function</option>
                     {
                         fetchFuncs.map((func) => (
@@ -92,8 +96,10 @@ const Contracts = () => {
                         ))
                     }
                 </select>
-                <button onClick={saveContract}>Save Contract</button>
+                <div style={{ width: "90%", display: "flex", justifyContent: "right" }}><button onClick={saveContract}>Save Contract</button></div>
+
             </div>
+            <hr style={{ width: "95%" }}></hr>
             <h3>Contracts</h3>
             {
                 contracts.map((contract) => (

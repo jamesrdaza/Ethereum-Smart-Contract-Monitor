@@ -2,11 +2,14 @@ import Task from './Task.js'
 import TaskContext from '../Contexts/TasksContext.js';
 import WalletContext from '../Contexts/WalletContext.js';
 import ContractContext from '../Contexts/ContractContext.js';
-import { useContext, useRef } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { storeTask } from '../indexedDB/BotDB.js';
+import DateTimePicker from 'react-datetime-picker';
 import { v4 as uuidv4 } from "uuid";
 
 const Tasks = () => {
+    const [value, onChange] = useState(new Date());
+
     const { wallets, searchWallets } = useContext(WalletContext);
     const { contracts, searchContracts, params } = useContext(ContractContext);
     const { tasks, addTask, paramState, setParamState, isHidden, setHidden } = useContext(TaskContext);
@@ -32,7 +35,7 @@ const Tasks = () => {
         let maxPriorityFee = maxPriorityInput.current.value;
         let value = valueInput.current.value;
         let args = []
-        //console.log(contract.args);
+
         // Get contract parameter fields and push into array for task object
         for (let i = 0; i < paramRef.current.length; i++) {
             args.push(paramRef.current[i].value);
@@ -46,9 +49,11 @@ const Tasks = () => {
         storeTask(uuid, wallet.pk, contract.address, contract.abi, contract.mintFunction, contract.flipFunction, value, maxGasFee, maxPriorityFee, args);
         setHidden(true);
     }
+
+    // Move inline into CSS file later
     return (
-        <div className='container'>
-            <select ref={walletInput}>
+        <div style={{ display: 'flex', flexWrap: "wrap", justifyContent: "center" }} className='container'>
+            <select style={{ width: "95%", marginBottom: "1%" }} ref={walletInput}>
                 <option >Select Wallet</option>
                 {
                     wallets.map((wallet) => (
@@ -56,7 +61,7 @@ const Tasks = () => {
                     ))
                 }
             </select>
-            <select ref={contractInput}>
+            <select style={{ width: "95%" }} ref={contractInput}>
                 <option >Select Contract</option>
                 {
                     contracts.map((contract) => (
@@ -64,20 +69,22 @@ const Tasks = () => {
                     ))
                 }
             </select>
-            <button onClick={getParams}>Add Task</button>
-            <div style={{ visibility: isHidden ? 'hidden' : 'visible' }}>
-                <input type="text" placeholder="Max Base Fee" ref={maxGasInput}></input>
-                <input type="text" placeholder="Priority Fee" ref={maxPriorityInput}></input>
-                <input type="text" placeholder="payable(ether)" ref={valueInput}></input>
+            <div style={{ width: "80%" }} /><button style={{ width: "15%" }} onClick={getParams}>Add Task</button>
+            <div style={{ display: isHidden ? 'none' : 'flex', visibility: isHidden ? 'hidden' : 'visible', width: "90%", flexWrap: "wrap" }}>
+                <input style={{ width: "100%" }} type="text" placeholder="Max Base Fee" ref={maxGasInput}></input>
+                <input style={{ width: "100%" }} type="text" placeholder="Priority Fee" ref={maxPriorityInput}></input>
+                <input style={{ width: "100%" }} type="text" placeholder="payable(ether)" ref={valueInput}></input>
                 {
                     // Make reference of every parameter input field
                     paramState.map((param, i) => (
-                        <input type="text" key={i} defaultValue={param.name} ref={el => paramRef.current[i] = el} ></input>
+                        <input type="text" key={i} placeholder={param.name} ref={el => paramRef.current[i] = el} ></input>
                     ))
                 }
+                <DateTimePicker className="dateTime" /* calendarClassName={"calendar"} clockClassName={"clock"}  */ onChange={onChange} value={value} />
                 <button onClick={createTask}>Save Task</button>
             </div>
-            <h3>Tasks</h3>
+            <hr style={{ width: "95%" }}></hr>
+            <h3 style={{ width: "95%" }} >Tasks</h3>
             {
                 tasks.map((task) => (
                     <Task key={task.uuid} task={task} />

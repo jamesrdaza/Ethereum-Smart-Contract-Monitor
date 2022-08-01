@@ -3,6 +3,12 @@
   src: url("./fonts/Montserrat-VariableFont_wght.ttf") format('truetype');
 }
 
+html,
+body {
+  background-color: black;
+  color: white;
+}
+
 .App {
   text-align: center;
 }
@@ -24,61 +30,78 @@
 
 .MintingBot {
   margin: auto;
+  margin-top: 15%;
   width: 50%;
-  border: 2px solid black;
+  border-radius: 20px;
   padding: 10px;
   margin-top: 1%;
   font-family: 'monsterrat';
+  background-color: #221f2b;
+  border: 1px solid gray;
 }
 
 .container {
-  border: 2px solid black;
+  border: 2px solid rgb(0, 0, 0);
+  border-radius: 10px;
   padding: 20px;
   margin-top: 5%;
   margin-bottom: 5%;
+  background-color: rgba(0, 0, 0, 0.141);
 }
 
 .itemContainer {
   font-size: 15px;
-  border: 1px solid black;
+  border: 2px solid black;
+  border-radius: 5px;
   margin: 1%;
   padding-left: 5px;
-  display: flex; 
+  display: flex;
+  background-color: #2A2731;
+  overflow: hidden;
 }
 
-input[type=text], input[type=password] {
+input[type=text],
+input[type=password] {
   width: 97%;
   border: 1px solid black;
+  border-radius: 10px;
   padding: 1%;
   margin: 2px;
+  background-color: #2A2731;
+  color: white;
+  font-family: "monsterrat";
 }
 
 button {
   margin: 4px;
-  border: 0;
-  background-color: black;
-  color:white;
+  border: 1px solid black;
+  background-color: #133774;
+  border-radius: 10px;
+  color: white;
   padding: 10px;
   font-family: "monsterrat";
-  cursor: pointer;  
+  cursor: pointer;
+  overflow: hidden;
 }
 
 button:hover {
-  background-color: darkgray;
+  background-color: rgb(56, 84, 186);
   cursor: pointer;
 }
 
-button:active{
+button:active {
   background-color: #282c34;
 }
-  
+
 select {
-  background-color: black;
+  background-color: #2A2731;
   color: white;
   font-family: "monsterrat";
   margin-right: 5px;
   padding: 10px;
-  
+  border-radius: 5px;
+  border: 1px solid black;
+
 }
 
 option:hover {
@@ -86,21 +109,28 @@ option:hover {
 }
 
 
+.dateTime {
+  background-color: #2A2731;
+  border: 1px solid black;
+  color: white;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
+
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgb(44, 44, 44); 
+  background: rgb(44, 44, 44);
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: black  ; 
+  background: black;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }

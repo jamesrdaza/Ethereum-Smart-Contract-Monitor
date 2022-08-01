@@ -12,11 +12,9 @@ export function ContractProvider({ children }) {
     const [fetchFuncs, setFetchFuncs] = useState([]); // State to render function fields
     const [isHidden, setHidden] = useState(true);
     const [params, setParams] = useState([]); // Function parameters
-    const [id, setId] = useState(0); // Temp Incremental ID's will change later
 
     const addContract = (address, abi, mintFunction, flipFunction, params) => {
         setContract((prev) => [...prev, { address, abi, mintFunction, flipFunction, params }])
-        setId(id + 1);
     };
 
     const removeContract = (address) => {
@@ -44,8 +42,6 @@ export function ContractProvider({ children }) {
     const clearParams = () => {
         setParams([])
     }
-
-
 
     return (
         <ContractContext.Provider value={{

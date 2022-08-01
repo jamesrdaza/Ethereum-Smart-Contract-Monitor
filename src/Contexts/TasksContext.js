@@ -8,7 +8,6 @@ export function TaskProvider({ children }) {
     const [paramState, setParamState] = useState([]); // Parameters to get filled by contract parameters
     const [isHidden, setHidden] = useState(true);
 
-
     const addTask = (uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params) => {
         setTask((prev) => [...prev, { uuid, wallet, contract, maxBaseFee, maxPriorityFee, value, params }])
     };

@@ -12,6 +12,7 @@ const Wallets = () => {
     const walletInput = useRef();
 
     const submitWallet = () => {
+        // Check if address is valid
         if (ethers.utils.isAddress(walletInput.current.value)) {
             addWallet(pkInput.current.value, walletInput.current.value);
             storeWallet(pkInput.current.value, walletInput.current.value);
@@ -21,7 +22,6 @@ const Wallets = () => {
         }
     }
 
-
     return (
         <div className='container'>
             Address<br></br>
@@ -29,6 +29,7 @@ const Wallets = () => {
             Private Key<br></br>
             <input type='password' ref={pkInput}></input> <br></br>
             <button onClick={submitWallet}>Save Wallet</button>
+            <hr style={{ width: "95%" }}></hr>
             <h3>Wallets</h3>
             {
                 wallets.map((wallet) => (

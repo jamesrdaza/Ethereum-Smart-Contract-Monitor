@@ -89,7 +89,6 @@ export function initDB(setFuncs) {
     }
 }
 
-// Potential callback to setId
 export function storeWallet(pk, addr) {
     let request = window.indexedDB.open("botDB");
 
@@ -114,13 +113,11 @@ export function storeWallet(pk, addr) {
         };
     };
 
-    //unable to open database
     request.onerror = function () {
         console.error("Error: Could not Access Database");
     };
 }
 
-// Not yet tested
 export function destroyWallet(addr) {
     let request = window.indexedDB.open(dbName);
 
@@ -131,12 +128,10 @@ export function destroyWallet(addr) {
         console.log(addr);
         let deleteRequest = objStore.delete(addr);
 
-        //Bullet object successfully deleted
         deleteRequest.onsuccess = function () {
             console.log(deleteRequest.result);
         };
 
-        //Unable to delete bullet object
         deleteRequest.onerror = function () {
             console.error("Error Could not delete wallet");
         };
@@ -144,14 +139,13 @@ export function destroyWallet(addr) {
         transaction.oncomplete = function () {
             db.close();
         };
-        //unable to open database
+
         request.onerror = function () {
             console.error("Error: Could not Access Database");
             return false;
         };
     }
 }
-
 
 export function storeContract(addr, abi, mint, flip, args) {
     let request = window.indexedDB.open("botDB");
